@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Budget Tracker</h1>
+            <nav>
+                <button class="tab-button active" data-tab="setup">Budget Setup</button>
+                <button class="tab-button" data-tab="tracking">Track Spending</button>
+                <button class="tab-button" data-tab="history">Spending History</button>
+            </nav>
+        </header>
+
+        <!-- Budget Setup Tab -->
+        <section id="setup" class="tab-content active">
+            <h2>📋 Set Budget Categories</h2>
+            <div class="category-setup">
+                <div class="input-group">
+                    <input type="text" id="category-name" placeholder="Category name (e.g., Groceries)">
+                    <input type="number" id="category-budget" placeholder="Budget amount" step="0.01">
+                    <button id="add-category">Add Category</button>
+                </div>
+                <div id="categories-list"></div>
+                <div class="total-budget">
+                    <h3>Total Monthly Budget: $<span id="total-budget">0.00</span></h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Track Spending Tab -->
+        <section id="tracking" class="tab-content">
+            <h2>📝 Track Your Spending</h2>
+            <div class="tracking-form">
+                <div class="input-group">
+                    <select id="spending-category">
+                        <option value="">Select Category</option>
+                    </select>
+                    <input type="number" id="spending-amount" placeholder="Amount spent" step="0.01">
+                    <input type="date" id="spending-date" value="">
+                    <input type="text" id="spending-note" placeholder="Note (optional)">
+                    <button id="add-spending">Add Spending</button>
+                </div>
+            </div>
+            
+            <div class="current-budgets">
+                <h3>Current Budget Status</h3>
+                <div id="budget-status"></div>
+            </div>
+            
+            <div class="recent-transactions">
+                <h3>Recent Transactions</h3>
+                <div class="transaction-filters">
+                    <input type="text" id="search-notes" placeholder="🔍 Search notes..." class="search-input">
+                    <select id="filter-category">
+                        <option value="all">All Categories</option>
+                    </select>
+                </div>
+                <div id="transactions-list"></div>
+            </div>
+        </section>
+
+        <!-- Spending History Tab -->
+        <section id="history" class="tab-content">
+            <h2>📊 Spending History</h2>
+            <div class="chart-controls">
+                <select id="chart-category">
+                    <option value="all">All Categories</option>
+                </select>
+                <select id="chart-timeframe">
+                    <option value="7days">Last 7 Days</option>
+                    <option value="30days">Last 30 Days</option>
+                    <option value="3months">Last 3 Months</option>
+                    <option value="all">All Time</option>
+                </select>
+            </div>
+            <div class="chart-container">
+                <canvas id="spendingChart"></canvas>
+            </div>
+            <div id="chart-legend"></div>
+            
+            <!-- Notes Summary Section -->
+            <div class="notes-summary">
+                <h3>📝 Recent Notes</h3>
+                <div id="notes-list"></div>
+            </div>
+        </section>
+
+        <!-- Edit Transaction Modal -->
+        <div id="edit-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3>Edit Transaction</h3>
+                <div class="modal-form">
+                    <select id="edit-category">
+                        <option value="">Select Category</option>
+                    </select>
+                    <input type="number" id="edit-amount" placeholder="Amount" step="0.01">
+                    <input type="date" id="edit-date">
+                    <input type="text" id="edit-note" placeholder="Note">
+                    <div class="modal-buttons">
+                        <button id="save-edit">Save Changes</button>
+                        <button id="cancel-edit" class="cancel-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
