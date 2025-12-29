@@ -6,12 +6,16 @@
     <title>Budget Tracker</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.0/build/global/luxon.min.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>💰 Budget Tracker</h1>
+            <div class="header-actions">
+                <button class="export-btn" onclick="budgetTracker.openExportMenu()">
+                    💾 Export Data
+                </button>
+            </div>
             <nav>
                 <button class="tab-button active" data-tab="setup">Budget Setup</button>
                 <button class="tab-button" data-tab="tracking">Track Spending</button>
@@ -76,6 +80,11 @@
                     <select id="chart-category">
                         <option value="all">All Categories</option>
                     </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="chart-note">Note:</label>
+                    <input type="text" id="chart-note" placeholder="Filter by note"/>
                 </div>
                 
                 <div class="control-group">
@@ -159,26 +168,145 @@
             </div>
         </section>
 
-        <!-- Edit Transaction Modal -->
-        <div id="edit-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <h3>Edit Transaction</h3>
-                <div class="modal-form">
-                    <select id="edit-category">
-                        <option value="">Select Category</option>
-                    </select>
-                    <input type="number" id="edit-amount" placeholder="Amount" step="0.01">
-                    <input type="date" id="edit-date">
-                    <input type="text" id="edit-note" placeholder="Note">
-                    <div class="modal-buttons">
-                        <button id="save-edit">Save Changes</button>
-                        <button id="cancel-edit" class="cancel-btn">Cancel</button>
-                    </div>
+
+    </div>
+
+            <!-- Edit Transaction Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Edit Transaction</h3>
+            <div class="modal-form">
+                <select id="edit-category">
+                    <option value="">Select Category</option>
+                </select>
+                <input type="number" id="edit-amount" placeholder="Amount" step="0.01">
+                <input type="date" id="edit-date">
+                <input type="text" id="edit-note" placeholder="Note">
+                <div class="modal-buttons">
+                    <button id="save-edit">Save Changes</button>
+                    <button id="cancel-edit" class="cancel-btn">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Export Menu Modal -->
+    <div id="export-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="budgetTracker.closeExportMenu()">&times;</span>
+            <h3>📤 Export Data</h3>
+            <div class="export-options">
+                <div class="export-option">
+                    <h4>Quick Export</h4>
+                    <button class="export-format-btn" onclick="budgetTracker.exportJSON()">
+                        📄 Export as JSON
+                    </button>
+                    <button class="export-format-btn" onclick="budgetTracker.exportCSV()">
+                        📊 Export as CSV
+                    </button>
+                    <button class="export-format-btn" onclick="budgetTracker.exportExcel()">
+                        📈 Export as Excel
+                    </button>
+                    <button class="export-format-btn" onclick="budgetTracker.copyToClipboard()">
+                        📋 Copy to Clipboard
+                    </button>
+                 </div>
+                   
+                <div class="export-option">
+                    <h4>Backup & Restore</h4>
+                    <button class="export-format-btn" onclick="budgetTracker.createBackup()">
+                        💾 Create Full Backup
+                    </button>
+                    <button class="export-format-btn" onclick="budgetTracker.downloadBackup()">
+                        ⬇️ Download Backup File
+                    </button>
+                    <div class="import-section">
+                        <label for="import-file">Import Backup:</label>
+                        <input type="file" id="import-file" accept=".json,.csv,.txt">
+                        <button onclick="budgetTracker.importFromFile()">Import Data</button>
+                    </div>
+                </div>
+                    
+                <div class="export-option">
+                    <h4>Advanced Options</h4>
+                    <button class="export-format-btn" onclick="budgetTracker.exportPDF()">
+                        📰 Export as PDF Report
+                    </button>
+                    <button class="export-format-btn" onclick="budgetTracker.printReport()">
+                        🖨️ Print Report
+                    </button>
+                    <button class="export-format-btn" onclick="budgetTracker.clearAllData()" style="background: #ff4757;">
+                        🗑️ Clear All Data
+                    </button>
+                </div>
+            </div>
+                
+            <div class="export-preview">
+                <h4>Data Preview</h4>
+                <div class="data-stats">
+                    <div class="data-stat">
+                        <span>Categories:</span>
+                        <span id="preview-categories">0</span>
+                    </div>
+                    <div class="data-stat">
+                        <span>Transactions:</span>
+                        <span id="preview-transactions">0</span>
+                    </div>
+                    <div class="data-stat">
+                        <span>Total Spent:</span>
+                        <span id="preview-total">$0.00</span>
+                    </div>
+                    <div class="data-stat">
+                        <span>Last Backup:</span>
+                        <span id="preview-backup">Never</span>
+                    </div>
+                </div>
+                <div class="preview-data">
+                    <textarea id="data-preview" readonly placeholder="Data preview will appear here..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Import Confirmation Modal -->
+        <div id="import-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="budgetTracker.closeImportModal()">&times;</span>
+                <h3>⚠️ Import Data</h3>
+                <div id="import-confirm-content">
+                    <p>Are you sure you want to import this data?</p>
+                    <div id="import-preview"></div>
+                    <div class="import-options">
+                        <label>
+                            <input type="radio" name="import-mode" value="replace" checked> 
+                            Replace all existing data
+                        </label>
+                        <label>
+                            <input type="radio" name="import-mode" value="merge"> 
+                            Merge with existing data (keep both)
+                        </label>
+                    </div>
+                    <div class="modal-buttons">
+                        <button id="confirm-import" onclick="budgetTracker.confirmImport()">Import Data</button>
+                        <button onclick="budgetTracker.closeImportModal()" class="cancel-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Message Modal -->
+        <div id="message-modal" class="modal">
+            <div class="modal-content" style="max-width: 400px;">
+                <h3 id="message-title">Success!</h3>
+                <p id="message-content">Operation completed successfully.</p>
+                <div class="modal-buttons">
+                    <button onclick="budgetTracker.closeMessageModal()">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script src="script.js"></script>
 </body>

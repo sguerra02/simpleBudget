@@ -3,12 +3,17 @@
     padding: 0;
     box-sizing: border-box;
 }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     background: linear-gradient(135deg, #007eea 0%, #004ba2 100%);
     min-height: 100vh;
-    padding: 10px;
+    padding: 20px;
 }
 
 .container {
@@ -24,7 +29,7 @@ body {
 header {
     background: linear-gradient(135deg, #007eea 0%, #004ba2 100%);
     color: white;
-    padding: 20px;
+    padding: 30px;
     text-align: center;
 }
 
@@ -58,7 +63,7 @@ nav {
 
 .tab-button.active {
     background: white;
-    color: #667eea;
+    color: #007eea;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
@@ -129,7 +134,7 @@ input, select, button {
 
 input:focus, select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #007eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -175,9 +180,9 @@ button:hover {
 .chart-summary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    gap: 10px;
     margin-bottom: 30px;
-    background: linear-gradient(135deg, #0079ff 0%, #00576c 100%);
+    background: linear-gradient(135deg, #0093fb 0%, #05576c 100%);
     padding: 25px;
     border-radius: 15px;
     color: white;
@@ -290,7 +295,7 @@ button:hover {
     background: rgba(0,0,0,0.05);
     border-radius: 5px;
     font-style: italic;
-    border-left: 3px solid #337eea;
+    border-left: 3px solid #007eea;
 }
 
 /* Transaction filters */
@@ -321,7 +326,7 @@ button:hover {
 
 .modal-content {
     background: white;
-    margin: 10% auto;
+    margin: 5% auto;
     padding: 30px;
     border-radius: 15px;
     width: 90%;
@@ -352,7 +357,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin-top: 20px;
+    margin-top: 5px;
 }
 
 .modal-buttons {
@@ -382,12 +387,12 @@ button:hover {
     margin-bottom: 10px;
     background: white;
     border-radius: 10px;
-    border-left: 4px solid #117eea;
+    border-left: 4px solid #007eea;
 }
 
 .note-category {
     font-weight: bold;
-    color: #667eea;
+    color: #007eea;
     margin-right: 10px;
 }
 
@@ -521,7 +526,7 @@ button:hover {
     }
     
     .chart-summary {
-        background: linear-gradient(135deg, #0644ad 0%, #c0392b 100%);
+        background: linear-gradient(135deg, #0044ad 0%, #00392b 100%);
     }
     
     .data-table-container {
@@ -534,7 +539,7 @@ button:hover {
     }
     
     #data-table thead {
-        background: linear-gradient(135deg, #2980b9 0%, #8e44ad 100%);
+        background: linear-gradient(135deg, #2980b9 0%, #0044ad 100%);
     }
     
     #data-table tbody tr {
@@ -543,5 +548,382 @@ button:hover {
     
     #data-table tbody tr:hover {
         background-color: #2d2d2d;
+    }
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: linear-gradient(135deg, #007eea 0%, #004ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+    position: relative;
+}
+
+header {
+    background: linear-gradient(135deg, #007eea 0%, #004ba2 100%);
+    color: white;
+    padding: 20px 30px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+}
+
+.header-actions {
+    margin-bottom: 15px;
+}
+
+.export-btn {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid white;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.export-btn:hover {
+    background: white;
+    color: #007eea;
+    transform: translateY(-2px);
+}
+
+nav {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.tab-button {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+}
+
+.tab-button.active {
+    background: white;
+    color: #007eea;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.tab-content {
+    display: none;
+    padding: 30px;
+    animation: fadeIn 0.5s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Export Modal Styles */
+.export-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.export-option {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.export-option h4 {
+    margin-bottom: 15px;
+    color: #007eea;
+    font-size: 1.1em;
+}
+
+.export-format-btn {
+    width: 100%;
+    margin-bottom: 10px;
+    text-align: left;
+    background: white;
+    border: 2px solid #e0e0e0;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.export-format-btn:hover {
+    background: #007eea;
+    color: white;
+    border-color: #007eea;
+    transform: translateY(-2px);
+}
+
+.import-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.import-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+}
+
+.import-section input[type="file"] {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 2px dashed #007eea;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+/* Export Preview */
+.export-preview {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.data-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.data-stat {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    border-left: 4px solid #007eea;
+}
+
+.data-stat span:first-child {
+    display: block;
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.data-stat span:last-child {
+    display: block;
+    font-weight: bold;
+    color: #007eea;
+    font-size: 1.1em;
+}
+
+.preview-data textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.9em;
+    resize: vertical;
+    background: white;
+}
+
+/* Import Modal */
+#import-confirm-content {
+    padding: 20px 0;
+}
+
+#import-preview {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.9em;
+    white-space: pre-wrap;
+}
+
+.import-options {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.import-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.import-options input[type="radio"] {
+    width: 18px;
+    height: 18px;
+}
+
+/* Message Modal */
+#message-modal .modal-content {
+    text-align: center;
+    padding: 30px;
+}
+
+#message-title {
+    color: #2ed573;
+    margin-bottom: 15px;
+}
+
+#message-content {
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+/* Chart Controls (existing styles...) */
+.chart-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-group label {
+    font-weight: 600;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.input-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+input, select, button, textarea {
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #007eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+button {
+    background: linear-gradient(135deg, #007eea 0%, #004ba2 100%);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Keep all existing styles for charts, tables, modals, etc. */
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        border-radius: 15px;
+        margin: 10px;
+    }
+    
+    header {
+        padding: 15px 20px;
+    }
+    
+    header h1 {
+        font-size: 2em;
+    }
+    
+    .header-actions {
+        margin-bottom: 10px;
+    }
+    
+    .export-btn {
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+    
+    .export-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .data-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .modal-content {
+        margin: 20% auto;
+        width: 95%;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .export-option, .export-preview, .import-options label {
+        background: #2d2d2d;
+        color: #ffffff;
+    }
+    
+    .data-stat, .preview-data textarea {
+        background: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    .export-format-btn {
+        background: #2d2d2d;
+        color: #ffffff;
+        border-color: #404040;
+    }
+    
+    .export-format-btn:hover {
+        background: #007eea;
+        border-color: #007eea;
     }
 }
