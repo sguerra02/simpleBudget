@@ -6,9 +6,9 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #007eea 0%, #004ba2 100%);
     min-height: 100vh;
-    padding: 20px;
+    padding: 10px;
 }
 
 .container {
@@ -22,9 +22,9 @@ body {
 }
 
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #007eea 0%, #004ba2 100%);
     color: white;
-    padding: 30px;
+    padding: 20px;
     text-align: center;
 }
 
@@ -134,7 +134,7 @@ input:focus, select:focus {
 }
 
 button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #007eea 0%, #004ba2 100%);
     color: white;
     border: none;
     cursor: pointer;
@@ -177,7 +177,7 @@ button:hover {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #0079ff 0%, #00576c 100%);
     padding: 25px;
     border-radius: 15px;
     color: white;
@@ -225,7 +225,7 @@ button:hover {
 }
 
 #data-table thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #007eea 0%, #004ba2 100%);
     color: white;
 }
 
@@ -255,7 +255,7 @@ button:hover {
 /* Transaction Count Badge */
 .transaction-count {
     display: inline-block;
-    background: #667eea;
+    background: #007eea;
     color: white;
     padding: 3px 8px;
     border-radius: 12px;
@@ -290,7 +290,7 @@ button:hover {
     background: rgba(0,0,0,0.05);
     border-radius: 5px;
     font-style: italic;
-    border-left: 3px solid #667eea;
+    border-left: 3px solid #337eea;
 }
 
 /* Transaction filters */
@@ -382,7 +382,7 @@ button:hover {
     margin-bottom: 10px;
     background: white;
     border-radius: 10px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #117eea;
 }
 
 .note-category {
@@ -521,7 +521,7 @@ button:hover {
     }
     
     .chart-summary {
-        background: linear-gradient(135deg, #8e44ad 0%, #c0392b 100%);
+        background: linear-gradient(135deg, #0644ad 0%, #c0392b 100%);
     }
     
     .data-table-container {
