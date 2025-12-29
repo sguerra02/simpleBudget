@@ -562,7 +562,6 @@ class BudgetTracker {
         const categoryFilter = document.getElementById('chart-category').value;
         const noteFilter = document.getElementById('chart-note').value;
         const timeframeFilter = document.getElementById('chart-timeframe').value;
-        const noteFilter = document.getElementById('chart-note').value;
         let filteredTransactions = [...this.transactions];
         
         // Apply category filter
