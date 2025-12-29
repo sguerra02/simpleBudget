@@ -372,7 +372,7 @@ button:hover {
 /* Notes summary section */
 .notes-summary {
     background: #f8f9fa;
-    padding: 25px;
+    padding: 15px;
     border-radius: 15px;
     margin-top: 30px;
 }
@@ -429,7 +429,7 @@ button:hover {
     }
     
     .tab-content {
-        padding: 20px;
+        padding: 10px;
     }
     
     .input-group {
@@ -449,14 +449,14 @@ button:hover {
     }
     
     .modal-content {
-        margin: 20% auto;
+        margin: 10% auto;
         width: 95%;
     }
     
     .transaction-item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 15px;
+        gap: 10px;
     }
     
     .transaction-actions {
@@ -502,7 +502,7 @@ button:hover {
     }
     
     .transaction-note {
-        background: rgba(255,255,255,0.05);
+        background: rgba(0,00,00);
         color: #bbb;
     }
     
@@ -521,7 +521,7 @@ button:hover {
     }
     
     .chart-summary {
-        background: linear-gradient(135deg, #0644ad 0%, #c0392b 100%);
+        background: linear-gradient(135deg, #0644ad 0%, #00392b 100%);
     }
     
     .data-table-container {
@@ -534,7 +534,7 @@ button:hover {
     }
     
     #data-table thead {
-        background: linear-gradient(135deg, #2980b9 0%, #8e44ad 100%);
+        background: linear-gradient(135deg, #2980b9 0%, #0044ad 100%);
     }
     
     #data-table tbody tr {

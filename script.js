@@ -9,6 +9,7 @@ class BudgetTracker {
             endDate: null
         };
         this.initializeApp();
+        this.updateExportPreview();
     }
 
     initializeApp() {
@@ -20,6 +21,7 @@ class BudgetTracker {
         this.setMinDate();
         this.setupModal();
         this.updateChart();
+        this.setupExportListeners();
     }
 
     setMinDate() {
@@ -67,6 +69,10 @@ class BudgetTracker {
 
         // Chart controls
         document.getElementById('chart-category').addEventListener('change', () => {
+            this.updateChart();
+        });
+
+        document.getElementById('chart-note').addEventListener('change', () => {
             this.updateChart();
         });
 
@@ -544,7 +550,7 @@ class BudgetTracker {
     getFilteredTransactions() {
         const categoryFilter = document.getElementById('chart-category').value;
         const timeframeFilter = document.getElementById('chart-timeframe').value;
-        
+        const noteFilter = document.getElementById('chart-note').value;
         let filteredTransactions = [...this.transactions];
         
         // Apply category filter
@@ -553,7 +559,11 @@ class BudgetTracker {
                 t.categoryId === parseInt(categoryFilter)
             );
         }
-        
+        if (noteFilter.length > 2 ) {
+            filteredTransactions = filteredTransactions.filter(t => 
+                t.note.includes(noteFilter)
+            );
+        }
         // Apply timeframe filter
         const now = new Date();
         let startDate;
@@ -876,7 +886,576 @@ class BudgetTracker {
             style.remove();
         }, 3000);
     }
-}
+    
+    
+       openExportMenu() {
+        this.updateExportPreview();
+        document.getElementById('export-modal').style.display = 'block';
+    }
+
+    closeExportMenu() {
+        document.getElementById('export-modal').style.display = 'none';
+    }
+
+    updateExportPreview() {
+        const totalSpent = this.transactions.reduce((sum, t) => sum + t.amount, 0);
+        
+        document.getElementById('preview-categories').textContent = this.categories.length;
+        document.getElementById('preview-transactions').textContent = this.transactions.length;
+        document.getElementById('preview-total').textContent = `$${totalSpent.toFixed(2)}`;
+        document.getElementById('preview-backup').textContent = this.lastBackup 
+            ? new Date(this.lastBackup).toLocaleString() 
+            : 'Never';
+        
+        // Show preview of data
+        const previewData = {
+            categories: this.categories.map(c => ({
+                name: c.name,
+                budget: c.budget
+            })),
+            transactions: this.transactions.slice(0, 5).map(t => ({
+                date: t.date,
+                amount: t.amount,
+                category: this.categories.find(c => c.id === t.categoryId)?.name || 'Unknown',
+                note: t.note || ''
+            }))
+        };
+        
+        document.getElementById('data-preview').value = JSON.stringify(previewData, null, 2);
+    }
+
+    exportJSON() {
+        const exportData = {
+            metadata: {
+                exportDate: new Date().toISOString(),
+                version: '1.0',
+                app: 'Budget Tracker'
+            },
+            categories: this.categories,
+            transactions: this.transactions
+        };
+        
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `budget-data-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        this.showMessage('Success', 'JSON file exported successfully!');
+    }
+
+    exportCSV() {
+        // Create categories CSV
+        let csvContent = 'CATEGORIES\n';
+        csvContent += 'Name,Budget,Color\n';
+        this.categories.forEach(category => {
+            csvContent += `"${category.name}",${category.budget},"${category.color || ''}"\n`;
+        });
+        
+        csvContent += '\nTRANSACTIONS\n';
+        csvContent += 'Date,Category,Amount,Note\n';
+        this.transactions.forEach(transaction => {
+            const category = this.categories.find(c => c.id === transaction.categoryId);
+            const categoryName = category ? category.name : 'Unknown';
+            const note = transaction.note ? `"${transaction.note.replace(/"/g, '""')}"` : '';
+            csvContent += `${transaction.date},"${categoryName}",${transaction.amount},${note}\n`;
+        });
+        
+        const dataBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `budget-data-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        this.showMessage('Success', 'CSV file exported successfully!');
+    }
+    
+    
+    exportExcel() {
+        // For Excel, we'll create HTML table and use CSS to trigger print/download
+        const htmlContent = `
+            <html>
+                <head>
+                    <title>Budget Data</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; }
+                        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #667eea; color: white; }
+                        .sheet-title { color: #333; margin-top: 30px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Budget Tracker Export</h1>
+                    <p>Exported: ${new Date().toLocaleString()}</p>
+                    
+                    <h2 class="sheet-title">Categories</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Budget</th>
+                                <th>Color</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${this.categories.map(cat => `
+                                <tr>
+                                    <td>${cat.name}</td>
+                                    <td>$${cat.budget.toFixed(2)}</td>
+                                    <td>${cat.color || ''}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h2 class="sheet-title">Transactions</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${this.transactions.map(trans => {
+                                const category = this.categories.find(c => c.id === trans.categoryId);
+                                return `
+                                    <tr>
+                                        <td>${trans.date}</td>
+                                        <td>${category ? category.name : 'Unknown'}</td>
+                                        <td>$${trans.amount.toFixed(2)}</td>
+                                        <td>${trans.note || ''}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </body>
+            </html>
+        `;
+        
+        const dataBlob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `budget-data-${new Date().toISOString().split('T')[0]}.xls`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        this.showMessage('Success', 'Excel file exported successfully!');
+    }
+
+    copyToClipboard() {
+        const exportData = {
+            metadata: {
+                exportDate: new Date().toISOString(),
+                app: 'Budget Tracker'
+            },
+            categories: this.categories,
+            transactions: this.transactions
+        };
+        
+        const dataStr = JSON.stringify(exportData, null, 2);
+        
+        navigator.clipboard.writeText(dataStr).then(() => {
+            this.showMessage('Success', 'Data copied to clipboard!');
+        }).catch(err => {
+            this.showMessage('Error', 'Failed to copy to clipboard: ' + err);
+        });
+    }
+    
+    
+    createBackup() {
+        const backupData = {
+            metadata: {
+                type: 'full-backup',
+                backupDate: new Date().toISOString(),
+                version: '1.0'
+            },
+            categories: this.categories,
+            transactions: this.transactions,
+            settings: {
+                lastBackup: new Date().toISOString()
+            }
+        };
+        
+        localStorage.setItem('budgetBackup', JSON.stringify(backupData));
+        localStorage.setItem('lastBackup', new Date().toISOString());
+        this.lastBackup = new Date().toISOString();
+        this.updateExportPreview();
+        
+        this.showMessage('Backup Created', 'Local backup saved successfully!');
+    }
+
+    downloadBackup() {
+        const backup = localStorage.getItem('budgetBackup');
+        if (!backup) {
+            this.showMessage('Error', 'No backup found. Create a backup first.');
+            return;
+        }
+        
+        const dataBlob = new Blob([backup], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `budget-backup-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        this.showMessage('Success', 'Backup file downloaded!');
+    }
+
+    handleFileImport(file) {
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const content = e.target.result;
+                let data;
+                
+                // Try to parse as JSON first
+                try {
+                    data = JSON.parse(content);
+                } catch (jsonError) {
+                    // If not JSON, try CSV
+                    data = this.parseCSV(content);
+                }
+                
+                this.importData = data;
+                this.showImportPreview(data);
+                
+            } catch (error) {
+                this.showMessage('Error', 'Failed to parse file: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+    
+    
+    parseCSV(csvContent) {
+        const lines = csvContent.split('\n');
+        const categories = [];
+        const transactions = [];
+        let parsingCategories = false;
+        let parsingTransactions = false;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            if (line === 'CATEGORIES') {
+                parsingCategories = true;
+                parsingTransactions = false;
+                i++; // Skip header line
+                continue;
+            }
+            
+            if (line === 'TRANSACTIONS') {
+                parsingCategories = false;
+                parsingTransactions = true;
+                i++; // Skip header line
+                continue;
+            }
+            
+            if (!line || line === '') continue;
+            
+            if (parsingCategories && i > 0) {
+                const [name, budget, color] = line.split(',').map(item => item.replace(/"/g, ''));
+                categories.push({
+                    id: Date.now() + i,
+                    name: name.trim(),
+                    budget: parseFloat(budget),
+                    color: color ? color.trim() : this.getRandomColor()
+                });
+            }
+            
+            if (parsingTransactions) {
+                // Handle CSV with quoted fields
+                const regex = /(?:"([^"]*(?:""[^"]*)*)"|([^,]*))(?:,|$)/g;
+                const matches = [...line.matchAll(regex)].map(m => m[1] || m[2]);
+                
+                if (matches.length >= 3) {
+                    const [date, categoryName, amount, note = ''] = matches;
+                    
+                    // Find or create category
+                    let category = categories.find(c => c.name === categoryName.trim());
+                    if (!category) {
+                        category = {
+                            id: Date.now() + categories.length + 1000,
+                            name: categoryName.trim(),
+                            budget: 0,
+                            color: this.getRandomColor()
+                        };
+                        categories.push(category);
+                    }
+                    
+                    transactions.push({
+                        id: Date.now() + transactions.length + 2000,
+                        date: date.trim(),
+                        amount: parseFloat(amount),
+                        categoryId: category.id,
+                        note: note.replace(/""/g, '"').trim(),
+                        timestamp: new Date(date).getTime() || Date.now()
+                    });
+                }
+            }
+        }
+        
+        return { categories, transactions };
+    }
+    
+    
+    
+    
+    
+    showImportPreview(data) {
+        const previewDiv = document.getElementById('import-preview');
+        
+        // Validate data structure
+        if (!data.categories && !data.transactions) {
+            this.showMessage('Error', 'Invalid file format. No data found.');
+            return;
+        }
+        
+        let previewText = '';
+        
+        if (data.categories && data.categories.length > 0) {
+            previewText += `Categories to import: ${data.categories.length}\n`;
+            data.categories.slice(0, 3).forEach(cat => {
+                previewText += `  • ${cat.name}: $${cat.budget}\n`;
+            });
+            if (data.categories.length > 3) {
+                previewText += `  ... and ${data.categories.length - 3} more\n`;
+            }
+        }
+        
+        if (data.transactions && data.transactions.length > 0) {
+            previewText += `\nTransactions to import: ${data.transactions.length}\n`;
+            data.transactions.slice(0, 3).forEach(trans => {
+                const category = data.categories?.find(c => c.id === trans.categoryId);
+                previewText += `  • ${trans.date}: $${trans.amount} (${category?.name || 'Unknown'})\n`;
+            });
+            if (data.transactions.length > 3) {
+                previewText += `  ... and ${data.transactions.length - 3} more\n`;
+            }
+        }
+        
+        previewDiv.textContent = previewText;
+        document.getElementById('import-modal').style.display = 'block';
+    }
+
+    closeImportModal() {
+        document.getElementById('import-modal').style.display = 'none';
+        this.importData = null;
+    }
+
+    confirmImport() {
+        if (!this.importData) {
+            this.showMessage('Error', 'No import data available');
+            return;
+        }
+        
+        const importMode = document.querySelector('input[name="import-mode"]:checked').value;
+        
+        try {
+            if (importMode === 'replace') {
+                // Replace all data
+                this.categories = this.importData.categories || [];
+                this.transactions = this.importData.transactions || [];
+            } else {
+                // Merge data
+                // Merge categories
+                this.importData.categories?.forEach(newCat => {
+                    const existingIndex = this.categories.findIndex(c => c.name === newCat.name);
+                    if (existingIndex === -1) {
+                        this.categories.push(newCat);
+                    } else {
+                        // Update existing category
+                        this.categories[existingIndex] = { ...this.categories[existingIndex], ...newCat };
+                    }
+                });
+                
+                // Merge transactions
+                this.importData.transactions?.forEach(newTrans => {
+                    this.transactions.push(newTrans);
+                });
+            }
+            
+            // Save to localStorage
+            this.saveCategories();
+            this.saveTransactions();
+            
+            // Update UI
+            this.loadCategories();
+            this.loadTransactions();
+            this.updateChart();
+            this.updateTotalBudget();
+            
+            this.showMessage('Success', `Data imported successfully! ${importMode === 'replace' ? 'All data replaced.' : 'Data merged.'}`);
+            
+            // Close modals
+            this.closeImportModal();
+            this.closeExportMenu();
+            
+        } catch (error) {
+            this.showMessage('Error', 'Failed to import data: ' + error.message);
+        }
+    }
+    
+    exportPDF() {
+        // Create a simple PDF-like report using print
+        const printWindow = window.open('', '_blank');
+        const printContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Budget Report</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    h1 { color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+                    .report-section { margin: 30px 0; }
+                    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f8f9fa; }
+                    .total-row { font-weight: bold; background-color: #f8f9fa; }
+                    .footer { margin-top: 50px; text-align: center; color: #666; font-size: 0.9em; }
+                </style>
+            </head>
+            <body>
+                <h1>Budget Tracker Report</h1>
+                <p>Generated: ${new Date().toLocaleString()}</p>
+                
+                <div class="report-section">
+                    <h2>Budget Summary</h2>
+                    <table>
+                        <tr>
+                            <th>Total Categories</th>
+                            <td>${this.categories.length}</td>
+                        </tr>
+                        <tr>
+                            <th>Total Transactions</th>
+                            <td>${this.transactions.length}</td>
+                        </tr>
+                        <tr class="total-row">
+                            <th>Total Spent</th>
+                            <td>$${this.transactions.reduce((sum, t) => sum + t.amount, 0).toFixed(2)}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="report-section">
+                    <h2>Categories</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Budget</th>
+                                <th>Spent</th>
+                                <th>Remaining</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${this.categories.map(category => {
+                                const spent = this.transactions
+                                    .filter(t => t.categoryId === category.id)
+                                    .reduce((sum, t) => sum + t.amount, 0);
+                                const remaining = category.budget - spent;
+                                return `
+                                    <tr>
+                                        <td>${category.name}</td>
+                                        <td>$${category.budget.toFixed(2)}</td>
+                                        <td>$${spent.toFixed(2)}</td>
+                                        <td style="color: ${remaining >= 0 ? 'green' : 'red'}">
+                                            $${remaining.toFixed(2)}
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="footer">
+                    <p>Report generated by Budget Tracker App</p>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        printWindow.focus();
+        
+        setTimeout(() => {
+            printWindow.print();
+            this.showMessage('PDF Export', 'Print dialog opened. Select "Save as PDF" to export.');
+        }, 500);
+    }
+    
+    
+    
+    printReport() {
+        window.print();
+    }
+    
+    clearAllData() {
+        if (confirm('⚠️ WARNING: This will delete ALL your data permanently.\n\nAre you sure you want to continue?')) {
+            // Create backup before clearing
+            this.createBackup();
+            
+            // Clear all data
+            this.categories = [];
+            this.transactions = [];
+            
+            // Clear localStorage
+            localStorage.removeItem('budgetCategories');
+            localStorage.removeItem('budgetTransactions');
+            
+            // Update UI
+            this.loadCategories();
+            this.loadTransactions();
+            this.updateChart();
+            this.updateTotalBudget();
+            
+            this.showMessage('Data Cleared', 'All data has been cleared. A backup was created before clearing.');
+            this.closeExportMenu();
+        }
+    }
+    
+    showMessage(title, content, isError = false) {
+        document.getElementById('message-title').textContent = title;
+        document.getElementById('message-title').style.color = isError ? '#ff4757' : '#2ed573';
+        document.getElementById('message-content').textContent = content;
+        document.getElementById('message-modal').style.display = 'block';
+    };
+
+    closeMessageModal() {
+        document.getElementById('message-modal').style.display = 'none';
+    };
+    
+    
+};
+
 
 // Initialize the app when the page loads
 let budgetTracker;
