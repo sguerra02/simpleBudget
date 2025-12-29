@@ -6,6 +6,7 @@
     <title>Budget Tracker</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.0/build/global/luxon.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -70,22 +71,88 @@
         <section id="history" class="tab-content">
             <h2>📊 Spending History</h2>
             <div class="chart-controls">
-                <select id="chart-category">
-                    <option value="all">All Categories</option>
-                </select>
-                <select id="chart-timeframe">
-                    <option value="7days">Last 7 Days</option>
-                    <option value="30days">Last 30 Days</option>
-                    <option value="3months">Last 3 Months</option>
-                    <option value="all">All Time</option>
-                </select>
+                <div class="control-group">
+                    <label for="chart-category">Category:</label>
+                    <select id="chart-category">
+                        <option value="all">All Categories</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="chart-grouping">Group By:</label>
+                    <select id="chart-grouping">
+                        <option value="day">Daily</option>
+                        <option value="week">Weekly</option>
+                        <option value="month">Monthly</option>
+                        <option value="year">Yearly</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="chart-timeframe">Timeframe:</label>
+                    <select id="chart-timeframe">
+                        <option value="7days">Last 7 Days</option>
+                        <option value="30days">Last 30 Days</option>
+                        <option value="3months">Last 3 Months</option>
+                        <option value="6months">Last 6 Months</option>
+                        <option value="1year">Last Year</option>
+                        <option value="all">All Time</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                </div>
             </div>
+            
+            <!-- Custom Date Range (hidden by default) -->
+            <div id="custom-range" class="custom-range" style="display: none;">
+                <div class="input-group">
+                    <input type="date" id="start-date" value="">
+                    <input type="date" id="end-date" value="">
+                    <button id="apply-date-range">Apply Range</button>
+                </div>
+            </div>
+            
             <div class="chart-container">
                 <canvas id="spendingChart"></canvas>
             </div>
-            <div id="chart-legend"></div>
             
-            <!-- Notes Summary Section -->
+            <div class="chart-summary">
+                <div class="summary-stat">
+                    <span class="stat-label">Total Shown:</span>
+                    <span class="stat-value" id="total-shown">$0.00</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="stat-label">Average per Period:</span>
+                    <span class="stat-value" id="average-period">$0.00</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="stat-label">Highest Period:</span>
+                    <span class="stat-value" id="highest-period">$0.00</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="stat-label">Periods Shown:</span>
+                    <span class="stat-value" id="periods-count">0</span>
+                </div>
+            </div>
+            
+            <div class="data-table-container">
+                <h3>📋 Detailed Data</h3>
+                <div class="table-wrapper">
+                    <table id="data-table">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Transactions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
             <div class="notes-summary">
                 <h3>📝 Recent Notes</h3>
                 <div id="notes-list"></div>

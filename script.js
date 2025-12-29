@@ -4,6 +4,10 @@ class BudgetTracker {
         this.transactions = JSON.parse(localStorage.getItem('budgetTransactions')) || [];
         this.chart = null;
         this.currentEditId = null;
+        this.customDateRange = {
+            startDate: null,
+            endDate: null
+        };
         this.initializeApp();
     }
 
@@ -15,16 +19,31 @@ class BudgetTracker {
         this.setupChart();
         this.setMinDate();
         this.setupModal();
+        this.updateChart();
     }
 
     setMinDate() {
         const dateInput = document.getElementById('spending-date');
         const editDateInput = document.getElementById('edit-date');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        
         const today = new Date().toISOString().split('T')[0];
+        
         dateInput.value = today;
         dateInput.max = today;
         editDateInput.value = today;
         editDateInput.max = today;
+        startDateInput.value = this.getDefaultStartDate();
+        startDateInput.max = today;
+        endDateInput.value = today;
+        endDateInput.max = today;
+    }
+
+    getDefaultStartDate() {
+        const date = new Date();
+        date.setDate(date.getDate() - 30); // Default to 30 days ago
+        return date.toISOString().split('T')[0];
     }
 
     setupEventListeners() {
@@ -51,7 +70,36 @@ class BudgetTracker {
             this.updateChart();
         });
 
-        document.getElementById('chart-timeframe').addEventListener('change', () => {
+        document.getElementById('chart-grouping').addEventListener('change', () => {
+            this.updateChart();
+        });
+
+        document.getElementById('chart-timeframe').addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                document.getElementById('custom-range').style.display = 'block';
+            } else {
+                document.getElementById('custom-range').style.display = 'none';
+                this.updateChart();
+            }
+        });
+
+        // Apply custom date range
+        document.getElementById('apply-date-range').addEventListener('click', () => {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates');
+                return;
+            }
+            
+            if (new Date(startDate) > new Date(endDate)) {
+                alert('Start date must be before end date');
+                return;
+            }
+            
+            this.customDateRange.startDate = startDate;
+            this.customDateRange.endDate = endDate;
             this.updateChart();
         });
 
@@ -471,6 +519,84 @@ class BudgetTracker {
         });
     }
 
+    // New helper methods for date grouping
+    getDateKey(date, grouping) {
+        const d = new Date(date);
+        
+        switch (grouping) {
+            case 'day':
+                return d.toLocaleDateString('en-CA'); // YYYY-MM-DD
+            case 'week':
+                // Get start of week (Monday)
+                const day = d.getDay();
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+                const weekStart = new Date(d.setDate(diff));
+                return `Week of ${weekStart.toLocaleDateString('en-CA')}`;
+            case 'month':
+                return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            case 'year':
+                return d.getFullYear().toString();
+            default:
+                return d.toLocaleDateString();
+        }
+    }
+
+    getFilteredTransactions() {
+        const categoryFilter = document.getElementById('chart-category').value;
+        const timeframeFilter = document.getElementById('chart-timeframe').value;
+        
+        let filteredTransactions = [...this.transactions];
+        
+        // Apply category filter
+        if (categoryFilter !== 'all') {
+            filteredTransactions = filteredTransactions.filter(t => 
+                t.categoryId === parseInt(categoryFilter)
+            );
+        }
+        
+        // Apply timeframe filter
+        const now = new Date();
+        let startDate;
+        
+        if (timeframeFilter === 'custom' && this.customDateRange.startDate) {
+            startDate = new Date(this.customDateRange.startDate);
+            const endDate = new Date(this.customDateRange.endDate);
+            
+            filteredTransactions = filteredTransactions.filter(t => {
+                const transactionDate = new Date(t.date);
+                return transactionDate >= startDate && transactionDate <= endDate;
+            });
+        } else {
+            switch (timeframeFilter) {
+                case '7days':
+                    startDate = new Date(now.setDate(now.getDate() - 7));
+                    break;
+                case '30days':
+                    startDate = new Date(now.setDate(now.getDate() - 30));
+                    break;
+                case '3months':
+                    startDate = new Date(now.setMonth(now.getMonth() - 3));
+                    break;
+                case '6months':
+                    startDate = new Date(now.setMonth(now.getMonth() - 6));
+                    break;
+                case '1year':
+                    startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+                    break;
+                default:
+                    startDate = null;
+            }
+            
+            if (startDate) {
+                filteredTransactions = filteredTransactions.filter(t => 
+                    new Date(t.date) >= startDate
+                );
+            }
+        }
+        
+        return filteredTransactions;
+    }
+
     setupChart() {
         const ctx = document.getElementById('spendingChart').getContext('2d');
         this.chart = new Chart(ctx, {
@@ -520,113 +646,182 @@ class BudgetTracker {
     }
 
     updateChart() {
-        const categoryFilter = document.getElementById('chart-category').value;
-        const timeframeFilter = document.getElementById('chart-timeframe').value;
+        const grouping = document.getElementById('chart-grouping').value;
+        const filteredTransactions = this.getFilteredTransactions();
         
-        let filteredTransactions = [...this.transactions];
-        
-        // Apply category filter
-        if (categoryFilter !== 'all') {
-            filteredTransactions = filteredTransactions.filter(t => t.categoryId === parseInt(categoryFilter));
+        if (filteredTransactions.length === 0) {
+            this.displayNoData();
+            return;
         }
         
-        // Apply timeframe filter
-        const now = new Date();
-        let startDate;
-        switch (timeframeFilter) {
-            case '7days':
-                startDate = new Date(now.setDate(now.getDate() - 7));
-                break;
-            case '30days':
-                startDate = new Date(now.setDate(now.getDate() - 30));
-                break;
-        case '3months':
-                startDate = new Date(now.setMonth(now.getMonth() - 3));
-                break;
-            default:
-                startDate = null;
-        }
+        // Group data by period and category
+        const groupedData = {};
+        const periodTotals = {};
+        const periodTransactionCounts = {};
         
-        if (startDate) {
-            filteredTransactions = filteredTransactions.filter(t => new Date(t.date) >= startDate);
-        }
-        
-        // Sort by date
-        filteredTransactions.sort((a, b) => new Date(a.date) - new Date(b.date));
-        
-        // Group by date and category
-        const dataByDate = {};
         filteredTransactions.forEach(transaction => {
-            const date = new Date(transaction.date).toLocaleDateString();
-            if (!dataByDate[date]) {
-                dataByDate[date] = {};
-            }
-            
+            const periodKey = this.getDateKey(transaction.date, grouping);
             const category = this.categories.find(c => c.id === transaction.categoryId);
             const categoryName = category ? category.name : 'Unknown';
             
-            if (!dataByDate[date][categoryName]) {
-                dataByDate[date][categoryName] = 0;
+            // Initialize period data if not exists
+            if (!groupedData[periodKey]) {
+                groupedData[periodKey] = {};
+                periodTotals[periodKey] = 0;
+                periodTransactionCounts[periodKey] = {};
             }
-            dataByDate[date][categoryName] += transaction.amount;
+            
+            if (!groupedData[periodKey][categoryName]) {
+                groupedData[periodKey][categoryName] = 0;
+            }
+            
+            if (!periodTransactionCounts[periodKey][categoryName]) {
+                periodTransactionCounts[periodKey][categoryName] = 0;
+            }
+            
+            // Add amount
+            groupedData[periodKey][categoryName] += transaction.amount;
+            periodTotals[periodKey] += transaction.amount;
+            periodTransactionCounts[periodKey][categoryName] += 1;
         });
         
-        // Prepare chart data
-        const dates = Object.keys(dataByDate);
-        const categories = [...new Set(filteredTransactions.map(t => {
+        // Sort periods chronologically
+        const periods = Object.keys(groupedData).sort((a, b) => {
+            if (grouping === 'week') {
+                return new Date(a.split(' of ')[1]) - new Date(b.split(' of ')[1]);
+            } else if (grouping === 'month') {
+                return new Date(a) - new Date(b);
+            } else if (grouping === 'year') {
+                return parseInt(a) - parseInt(b);
+            } else {
+                return new Date(a) - new Date(b);
+            }
+        });
+        
+        // Get all unique categories in the filtered data
+        const allCategories = [...new Set(filteredTransactions.map(t => {
             const cat = this.categories.find(c => c.id === t.categoryId);
             return cat ? cat.name : 'Unknown';
         }))];
         
-        const datasets = categories.map(categoryName => {
+        // Prepare datasets for chart
+        const datasets = allCategories.map(categoryName => {
             const category = this.categories.find(c => c.name === categoryName);
+            const data = periods.map(period => groupedData[period][categoryName] || 0);
+            
             return {
                 label: categoryName,
-                data: dates.map(date => dataByDate[date][categoryName] || 0),
+                data: data,
                 borderColor: category ? category.color : this.getRandomColor(),
                 backgroundColor: category ? this.hexToRgba(category.color, 0.1) : 'rgba(0,0,0,0.1)',
                 borderWidth: 3,
                 tension: 0.1,
-                fill: true
+                fill: true,
+                stack: grouping === 'day' ? 'stack' : undefined // Stack only for daily view
             };
         });
         
-        this.chart.data.labels = dates;
+        // Update chart
+        this.chart.data.labels = periods;
         this.chart.data.datasets = datasets;
         this.chart.update();
         
-        // Update legend
-        this.updateChartLegend(dates, dataByDate);
+        // Update summary stats
+        this.updateSummaryStats(periods, periodTotals);
+        
+        // Update data table
+        this.updateDataTable(periods, groupedData, periodTransactionCounts, grouping);
         
         // Update notes summary
         this.updateNotesSummary();
     }
 
-    updateChartLegend(dates, dataByDate) {
-        const legendDiv = document.getElementById('chart-legend');
-        legendDiv.innerHTML = '';
+    updateSummaryStats(periods, periodTotals) {
+        const totalShown = Object.values(periodTotals).reduce((sum, val) => sum + val, 0);
+        const averagePeriod = periods.length > 0 ? totalShown / periods.length : 0;
+        const highestPeriod = Math.max(...Object.values(periodTotals));
         
-        if (dates.length === 0) {
-            legendDiv.innerHTML = '<p style="text-align: center; color: #666;">No data available for selected filters</p>';
-            return;
+        document.getElementById('total-shown').textContent = `$${totalShown.toFixed(2)}`;
+        document.getElementById('average-period').textContent = `$${averagePeriod.toFixed(2)}`;
+        document.getElementById('highest-period').textContent = `$${highestPeriod.toFixed(2)}`;
+        document.getElementById('periods-count').textContent = periods.length;
+    }
+
+    updateDataTable(periods, groupedData, transactionCounts, grouping) {
+        const tableBody = document.getElementById('table-body');
+        tableBody.innerHTML = '';
+        
+        let totalAllPeriods = 0;
+        let rowCount = 0;
+        
+        periods.forEach(period => {
+            const periodTotal = Object.values(groupedData[period]).reduce((sum, val) => sum + val, 0);
+            totalAllPeriods += periodTotal;
+            
+            Object.keys(groupedData[period]).forEach(categoryName => {
+                const amount = groupedData[period][categoryName];
+                const count = transactionCounts[period][categoryName];
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${period}</td>
+                    <td>${categoryName}</td>
+                    <td><strong>$${amount.toFixed(2)}</strong></td>
+                    <td><span class="transaction-count">${count}</span></td>
+                `;
+                tableBody.appendChild(row);
+                rowCount++;
+            });
+            
+            // Add period total row
+            if (Object.keys(groupedData[period]).length > 1) {
+                const totalRow = document.createElement('tr');
+                totalRow.style.backgroundColor = '#f8f9fa';
+                totalRow.style.fontWeight = 'bold';
+                totalRow.innerHTML = `
+                    <td colspan="2"><em>${period} Total</em></td>
+                    <td>$${periodTotal.toFixed(2)}</td>
+                    <td></td>
+                `;
+                tableBody.appendChild(totalRow);
+                rowCount++;
+            }
+        });
+        
+        // Add grand total row if multiple rows
+        if (rowCount > 1) {
+            const grandTotalRow = document.createElement('tr');
+            grandTotalRow.style.backgroundColor = '#e3f2fd';
+            grandTotalRow.style.fontWeight = 'bold';
+            grandTotalRow.style.fontSize = '1.1em';
+            grandTotalRow.innerHTML = `
+                <td colspan="2">Grand Total (${periods.length} ${grouping}${periods.length > 1 ? 's' : ''})</td>
+                <td>$${totalAllPeriods.toFixed(2)}</td>
+                <td></td>
+            `;
+            tableBody.appendChild(grandTotalRow);
         }
+    }
+
+    displayNoData() {
+        this.chart.data.labels = [];
+        this.chart.data.datasets = [];
+        this.chart.update();
         
-        const legendHtml = `
-            <h3>Total Spending by Date</h3>
-            <div style="display: grid; gap: 10px; margin-top: 15px;">
-                ${dates.map(date => {
-                    const total = Object.values(dataByDate[date]).reduce((sum, val) => sum + val, 0);
-                    return `
-                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 5px;">
-                            <span>${date}</span>
-                            <span style="font-weight: bold; color: #667eea;">$${total.toFixed(2)}</span>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
+        document.getElementById('total-shown').textContent = '$0.00';
+        document.getElementById('average-period').textContent = '$0.00';
+        document.getElementById('highest-period').textContent = '$0.00';
+        document.getElementById('periods-count').textContent = '0';
+        
+        document.getElementById('table-body').innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
+                    No transactions found for the selected filters.
+                    <br>
+                    <small>Add some transactions first!</small>
+                </td>
+            </tr>
         `;
-        
-        legendDiv.innerHTML = legendHtml;
     }
 
     getRandomColor() {
@@ -646,7 +841,6 @@ class BudgetTracker {
     }
 
     showNotification(message) {
-        // Create notification element
         const notification = document.createElement('div');
         notification.style.cssText = `
             position: fixed;
@@ -664,7 +858,6 @@ class BudgetTracker {
         
         document.body.appendChild(notification);
         
-        // Add CSS animations
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideInRight {
@@ -678,7 +871,6 @@ class BudgetTracker {
         `;
         document.head.appendChild(style);
         
-        // Remove notification after 3 seconds
         setTimeout(() => {
             notification.remove();
             style.remove();

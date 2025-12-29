@@ -89,6 +89,29 @@ h3 {
     font-size: 1.3em;
 }
 
+/* Chart Controls */
+.chart-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-group label {
+    font-weight: 600;
+    color: #555;
+    font-size: 0.9em;
+}
+
 .input-group {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -123,80 +146,21 @@ button:hover {
     box-shadow: 0 7px 20px rgba(102, 126, 234, 0.4);
 }
 
-#categories-list, #budget-status, #transactions-list {
-    display: grid;
-    gap: 15px;
-}
-
-.category-item, .budget-item, .transaction-item {
-    background: #f8f9fa;
+/* Custom Date Range */
+.custom-range {
+    background: #e3f2fd;
     padding: 20px;
     border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-left: 5px solid #667eea;
-    animation: slideIn 0.3s ease;
+    margin-bottom: 25px;
+    animation: slideDown 0.3s ease;
 }
 
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-20px); }
-    to { opacity: 1; transform: translateX(0); }
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.delete-btn {
-    background: #ff4757;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-}
-
-.delete-btn:hover {
-    background: #ff3742;
-    transform: scale(1.05);
-}
-
-.edit-btn {
-    background: #2ed573;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    margin-right: 8px;
-}
-
-.edit-btn:hover {
-    background: #25c064;
-    transform: scale(1.05);
-}
-
-.total-budget {
-    background: linear-gradient(135deg, #4cd964 0%, #5ac8fa 100%);
-    color: white;
-    padding: 25px;
-    border-radius: 15px;
-    margin-top: 30px;
-    text-align: center;
-}
-
-.total-budget h3 {
-    font-size: 1.5em;
-    margin: 0;
-    color: white;
-}
-
-.chart-controls {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
+/* Chart Container */
 .chart-container {
     position: relative;
     height: 400px;
@@ -207,7 +171,101 @@ button:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-/* Progress bar styles */
+/* Chart Summary Stats */
+.chart-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 25px;
+    border-radius: 15px;
+    color: white;
+}
+
+.summary-stat {
+    text-align: center;
+    padding: 15px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9em;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+/* Data Table */
+.data-table-container {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+#data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+#data-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+#data-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+#data-table tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s ease;
+}
+
+#data-table tbody tr:hover {
+    background-color: #f5f7ff;
+}
+
+#data-table td {
+    padding: 12px 15px;
+}
+
+#data-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Transaction Count Badge */
+.transaction-count {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+/* Progress bars and existing styles... */
+/* ... (keep all previous progress bar, modal, notes styles) ... */
+
 .progress-bar {
     height: 20px;
     background: #e0e0e0;
@@ -382,6 +440,14 @@ button:hover {
         height: 300px;
     }
     
+    .chart-controls {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
     .modal-content {
         margin: 20% auto;
         width: 95%;
@@ -402,6 +468,10 @@ button:hover {
     .edit-btn, .delete-btn {
         flex: 1;
         text-align: center;
+    }
+    
+    #data-table {
+        font-size: 0.9em;
     }
 }
 
@@ -448,5 +518,30 @@ button:hover {
     .modal-content {
         background: #2d2d2d;
         color: #ffffff;
+    }
+    
+    .chart-summary {
+        background: linear-gradient(135deg, #8e44ad 0%, #c0392b 100%);
+    }
+    
+    .data-table-container {
+        background: #2d2d2d;
+    }
+    
+    #data-table {
+        background: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    #data-table thead {
+        background: linear-gradient(135deg, #2980b9 0%, #8e44ad 100%);
+    }
+    
+    #data-table tbody tr {
+        border-color: #333;
+    }
+    
+    #data-table tbody tr:hover {
+        background-color: #2d2d2d;
     }
 }
