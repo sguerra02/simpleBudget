@@ -802,6 +802,7 @@ class BudgetTracker {
             if (Object.keys(groupedData[period]).length > 1) {
                 const totalRow = document.createElement('tr');
                 totalRow.style.backgroundColor = '#f8f9fa';
+                totalRow.style.colors ="#050505"
                 totalRow.style.fontWeight = 'bold';
                 totalRow.innerHTML = `
                     <td colspan="2"><em>${period} Total</em></td>
@@ -817,6 +818,7 @@ class BudgetTracker {
         if (rowCount > 1) {
             const grandTotalRow = document.createElement('tr');
             grandTotalRow.style.backgroundColor = '#e3f2fd';
+            grandTotalRow.style.color = "#050505"
             grandTotalRow.style.fontWeight = 'bold';
             grandTotalRow.style.fontSize = '1.1em';
             grandTotalRow.innerHTML = `

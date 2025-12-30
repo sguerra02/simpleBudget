@@ -3,11 +3,6 @@
     padding: 0;
     box-sizing: border-box;
 }
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
@@ -322,6 +317,7 @@ button:hover {
     background: rgba(0,0,0,0.5);
     z-index: 1000;
     animation: fadeIn 0.3s ease;
+    overflow: auto;
 }
 
 .modal-content {
@@ -329,7 +325,7 @@ button:hover {
     margin: 5% auto;
     padding: 30px;
     border-radius: 15px;
-    width: 90%;
+    width: 100%;
     max-width: 500px;
     position: relative;
     animation: slideUp 0.3s ease;
@@ -413,150 +409,12 @@ button:hover {
     line-height: 1.5;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-    .container {
-        border-radius: 15px;
-        margin: 10px;
-    }
-    
-    header {
-        padding: 20px;
-    }
-    
-    header h1 {
-        font-size: 2em;
-    }
-    
-    .tab-button {
-        padding: 10px 20px;
-        font-size: 0.9em;
-    }
-    
-    .tab-content {
-        padding: 10px;
-    }
-    
-    .input-group {
-        grid-template-columns: 1fr;
-    }
-    
-    .chart-container {
-        height: 300px;
-    }
-    
-    .chart-controls {
-        grid-template-columns: 1fr;
-    }
-    
-    .chart-summary {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .modal-content {
-        margin: 10% auto;
-        width: 95%;
-    }
-    
-    .transaction-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    
-    .transaction-actions {
-        display: flex;
-        gap: 10px;
-        width: 100%;
-    }
-    
-    .edit-btn, .delete-btn {
-        flex: 1;
-        text-align: center;
-    }
-    
-    #data-table {
-        font-size: 0.9em;
-    }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    body {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    }
-    
-    .container {
-        background: #1a1a1a;
-        color: #ffffff;
-    }
-    
-    h2, h3 {
-        color: #ffffff;
-    }
-    
-    .category-item, .budget-item, .transaction-item {
-        background: #2d2d2d;
-        color: #ffffff;
-    }
-    
-    input, select {
-        background: #2d2d2d;
-        color: #ffffff;
-        border-color: #404040;
-    }
-    
-    .transaction-note {
-        background: rgba(0,00,00);
-        color: #bbb;
-    }
-    
-    .notes-summary {
-        background: #2d2d2d;
-    }
-    
-    .note-item {
-        background: #1a1a1a;
-        color: #ffffff;
-    }
-    
-    .modal-content {
-        background: #2d2d2d;
-        color: #ffffff;
-    }
-    
-    .chart-summary {
-        background: linear-gradient(135deg, #0044ad 0%, #00392b 100%);
-    }
-    
-    .data-table-container {
-        background: #2d2d2d;
-    }
-    
-    #data-table {
-        background: #1a1a1a;
-        color: #ffffff;
-    }
-    
-    #data-table thead {
-        background: linear-gradient(135deg, #2980b9 0%, #0044ad 100%);
-        background: linear-gradient(135deg, #2980b9 0%, #0044ad 100%);
-    }
-    
-    #data-table tbody tr {
-        border-color: #333;
-    }
-    
-    #data-table tbody tr:hover {
-        background-color: #2d2d2d;
-    }
-}
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     background: linear-gradient(135deg, #007eea 0%, #004ba2 100%);
     min-height: 100vh;
-    padding: 20px;
+    padding: 15px;
 }
 
 .container {
@@ -613,7 +471,7 @@ nav {
     background: rgba(255,255,255,0.2);
     border: none;
     color: white;
-    padding: 12px 24px;
+    padding: 12px 18px;
     border-radius: 50px;
     font-size: 1em;
     cursor: pointer;
@@ -633,7 +491,7 @@ nav {
 
 .tab-content {
     display: none;
-    padding: 30px;
+    padding: 15px;
     animation: fadeIn 0.5s ease;
 }
 
@@ -708,7 +566,7 @@ nav {
 /* Export Preview */
 .export-preview {
     background: #f8f9fa;
-    padding: 20px;
+    padding: 1 0px;
     border-radius: 10px;
 }
 
@@ -744,7 +602,7 @@ nav {
 .preview-data textarea {
     width: 100%;
     min-height: 150px;
-    padding: 15px;
+    padding: 10px;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
     font-family: monospace;
@@ -867,11 +725,65 @@ button:hover {
 
 /* Keep all existing styles for charts, tables, modals, etc. */
 
-/* Responsive Design */
+
+
+/* Responsive design */
 @media (max-width: 768px) {
+    
+    .tab-button {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+    
+    .tab-content {
+        padding: 10px;
+    }
+    
+    .input-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+    
+    .chart-controls {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+    }
+    
+    .transaction-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .transaction-actions {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .edit-btn, .delete-btn {
+        flex: 1;
+        text-align: center;
+    }
+    
+    #data-table {
+        font-size: 0.9em;
+    }
+    
     .container {
         border-radius: 15px;
-        margin: 10px;
+        margin: 5px;
     }
     
     header {
@@ -900,7 +812,7 @@ button:hover {
     }
     
     .modal-content {
-        margin: 20% auto;
+        margin: 10% auto;
         width: 95%;
     }
 }
@@ -953,6 +865,9 @@ button:hover {
     
     .chart-summary {
         background: linear-gradient(135deg, #0044ad 0%, #00392b 100%);
+    }
+    .chart-controls{
+        background: #2d2d2d;
     }
     
     .data-table-container {
