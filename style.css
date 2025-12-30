@@ -907,6 +907,75 @@ button:hover {
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
+    
+    body {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    }
+    
+    .container {
+        background: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    h2, h3 {
+        color: #ffffff;
+    }
+    
+    .category-item, .budget-item, .transaction-item {
+        background: #2d2d2d;
+        color: #ffffff;
+    }
+    
+    input, select {
+        background: #2d2d2d;
+        color: #ffffff;
+        border-color: #404040;
+    }
+    
+    .transaction-note {
+        background: rgba(255,255,255,0.05);
+        color: #bbb;
+    }
+    
+    .notes-summary {
+        background: #2d2d2d;
+    }
+    
+    .note-item {
+        background: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    .modal-content {
+        background: #2d2d2d;
+        color: #ffffff;
+    }
+    
+    .chart-summary {
+        background: linear-gradient(135deg, #0044ad 0%, #00392b 100%);
+    }
+    
+    .data-table-container {
+        background: #2d2d2d;
+    }
+    
+    #data-table {
+        background: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    #data-table thead {
+        background: linear-gradient(135deg, #2980b9 0%, #0044ad 100%);
+    }
+    
+    #data-table tbody tr {
+        border-color: #333;
+    }
+    
+    #data-table tbody tr:hover {
+        background-color: #2d2d2d;
+    }
+    
     .export-option, .export-preview, .import-options label {
         background: #2d2d2d;
         color: #ffffff;
